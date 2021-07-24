@@ -9,6 +9,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import org.bson.Document;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
 /**
  *
@@ -28,7 +29,8 @@ public class DatabaseClient {
         if (testUser != null)//check if username found in database
         {
             String passTest = testUser.getString("password");
-            return password.equals(passTest);//true if password matches, false if no match
+            String hashedPass = BCrypt.hashpw(password, "$2a$10$OFmqUlZhevR2SAbalfBxNe");
+            return hashedPass.equals(passTest);//true if password matches, false if no match
         }
         else
             return false;//Username not found
@@ -42,7 +44,8 @@ public class DatabaseClient {
        {
            Map<String, Object> userFields = new HashMap<>(); 
            userFields.put("username", username);
-           userFields.put("password", password);
+           String hashedPassword = BCrypt.hashpw(password, "$2a$10$OFmqUlZhevR2SAbalfBxNe");
+           userFields.put("password", hashedPassword);
            try
            {
                userInfo.insertOne(new Document(userFields));
